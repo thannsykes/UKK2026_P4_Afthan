@@ -37,5 +37,22 @@ Route::middleware('auth')->prefix('user')->name('user.')->group(function () {
     // Transaksi
     Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
     Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('transaksi.show');
+});
 
+use App\Http\Controllers\Admin\UserController;
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('users', UserController::class)->except(['edit', 'update', 'show']);
+
+    // Sementara pakai redirect dulu, nanti diganti controller beneran
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/buku', function () {
+        return redirect('/dashboard');
+    })->name('buku.index');
+    Route::get('/transaksi', function () {
+        return redirect('/dashboard');
+    })->name('transaksi.index');
+    Route::get('/anggota', function () {
+        return redirect('/dashboard');
+    })->name('anggota.index');
 });
