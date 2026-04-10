@@ -18,7 +18,7 @@
     <aside class="left-sidebar">
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-between">
-          <a href="{{ route('dashboard') }}" class="text-nowrap logo-img">
+          <a href="#" class="text-nowrap logo-img">
             <img src="{{ asset('assets/images/logos/logo.svg') }}" alt="logo" width="180">
           </a>
           <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
@@ -29,69 +29,103 @@
         <nav class="sidebar-nav scroll-sidebar" data-simplebar>
           <ul id="sidebarnav">
 
-            {{-- Label --}}
+            {{-- ===== MENU ADMIN ===== --}}
+            @if(auth()->user()->role === 'admin')
+
             <li class="nav-small-cap">
               <iconify-icon icon="solar:minus-cirlce-line-duotone" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">Menu Utama</span>
+              <span class="hide-menu">Admin</span>
             </li>
 
-            {{-- Dashboard --}}
             <li class="sidebar-item">
-              <a class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
-                href="{{ route('dashboard') }}" aria-expanded="false">
+              <a class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
+                href="{{ route('admin.dashboard') }}">
                 <iconify-icon icon="solar:home-smile-angle-bold-duotone" class="fs-6"></iconify-icon>
                 <span class="hide-menu">Dashboard</span>
               </a>
             </li>
-
-            {{-- Buku --}}
             <li class="sidebar-item">
-              <a class="sidebar-link {{ request()->routeIs('user.buku.*') ? 'active' : '' }}"
-                href="{{ route('user.buku.index') }}" aria-expanded="false">
+              <a class="sidebar-link {{ request()->routeIs('admin.anggota.*') ? 'active' : '' }}"
+                href="{{ route('admin.anggota.index') }}">
+                <iconify-icon icon="solar:users-group-rounded-bold-duotone" class="fs-6"></iconify-icon>
+                <span class="hide-menu">CRUD Anggota</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link {{ request()->routeIs('admin.petugas.*') ? 'active' : '' }}"
+                href="{{ route('admin.petugas.index') }}">
+                <iconify-icon icon="solar:user-id-bold-duotone" class="fs-6"></iconify-icon>
+                <span class="hide-menu">CRUD Petugas</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link {{ request()->routeIs('admin.buku.*') ? 'active' : '' }}"
+                href="{{ route('admin.buku.index') }}">
+                <iconify-icon icon="solar:book-bold-duotone" class="fs-6"></iconify-icon>
+                <span class="hide-menu">CRUD Buku</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link {{ request()->routeIs('admin.kelas.*') ? 'active' : '' }}"
+                href="{{ route('admin.kelas.index') }}">
+                <iconify-icon icon="solar:buildings-bold-duotone" class="fs-6"></iconify-icon>
+                <span class="hide-menu">CRUD Kelas</span>
+              </a>
+            </li>
+
+            {{-- ===== MENU PETUGAS ===== --}}
+            @elseif(auth()->user()->role === 'petugas')
+
+            <li class="nav-small-cap">
+              <iconify-icon icon="solar:minus-cirlce-line-duotone" class="nav-small-cap-icon fs-4"></iconify-icon>
+              <span class="hide-menu">Petugas</span>
+            </li>
+
+            <li class="sidebar-item">
+              <a class="sidebar-link {{ request()->routeIs('petugas.dashboard') ? 'active' : '' }}"
+                href="{{ route('petugas.dashboard') }}">
+                <iconify-icon icon="solar:home-smile-angle-bold-duotone" class="fs-6"></iconify-icon>
+                <span class="hide-menu">Dashboard</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link {{ request()->routeIs('petugas.transaksi.*') ? 'active' : '' }}"
+                href="{{ route('petugas.transaksi.index') }}">
+                <iconify-icon icon="solar:clipboard-list-bold-duotone" class="fs-6"></iconify-icon>
+                <span class="hide-menu">Transaksi Peminjaman</span>
+              </a>
+            </li>
+
+            {{-- ===== MENU ANGGOTA ===== --}}
+            @else
+
+            <li class="nav-small-cap">
+              <iconify-icon icon="solar:minus-cirlce-line-duotone" class="nav-small-cap-icon fs-4"></iconify-icon>
+              <span class="hide-menu">Anggota</span>
+            </li>
+
+            <li class="sidebar-item">
+              <a class="sidebar-link {{ request()->routeIs('anggota.dashboard') ? 'active' : '' }}"
+                href="{{ route('anggota.dashboard') }}">
+                <iconify-icon icon="solar:home-smile-angle-bold-duotone" class="fs-6"></iconify-icon>
+                <span class="hide-menu">Dashboard</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link {{ request()->routeIs('anggota.buku.*') ? 'active' : '' }}"
+                href="{{ route('anggota.buku.index') }}">
                 <iconify-icon icon="solar:book-bold-duotone" class="fs-6"></iconify-icon>
                 <span class="hide-menu">Daftar Buku</span>
               </a>
             </li>
-
-            {{-- Transaksi --}}
             <li class="sidebar-item">
-              <a class="sidebar-link {{ request()->routeIs('user.transaksi.*') ? 'active' : '' }}"
-                href="{{ route('user.transaksi.index') }}" aria-expanded="false">
+              <a class="sidebar-link {{ request()->routeIs('anggota.history') ? 'active' : '' }}"
+                href="{{ route('anggota.history') }}">
                 <iconify-icon icon="solar:document-text-bold-duotone" class="fs-6"></iconify-icon>
-                <span class="hide-menu">Peminjaman Saya</span>
+                <span class="hide-menu">History Peminjaman</span>
               </a>
             </li>
 
-            {{-- Hanya tampil jika admin --}}
-            @if(auth()->user()->role === 'admin')
-            <li class="nav-small-cap">
-              <iconify-icon icon="solar:minus-cirlce-line-duotone" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">Manajemen</span>
-            </li>
-
-            <li class="sidebar-item">
-              <a class="sidebar-link {{ request()->routeIs('admin.buku.*') ? 'active' : '' }}"
-                href="{{ route('admin.buku.index') }}" aria-expanded="false">
-                <iconify-icon icon="solar:library-bold-duotone" class="fs-6"></iconify-icon>
-                <span class="hide-menu">Kelola Buku</span>
-              </a>
-            </li>
-
-            <li class="sidebar-item">
-              <a class="sidebar-link {{ request()->routeIs('admin.transaksi.*') ? 'active' : '' }}"
-                href="{{ route('admin.transaksi.index') }}" aria-expanded="false">
-                <iconify-icon icon="solar:clipboard-list-bold-duotone" class="fs-6"></iconify-icon>
-                <span class="hide-menu">Kelola Peminjaman</span>
-              </a>
-            </li>
-
-            <li class="sidebar-item">
-              <a class="sidebar-link {{ request()->routeIs('admin.anggota.*') ? 'active' : '' }}"
-                href="{{ route('admin.anggota.index') }}" aria-expanded="false">
-                <iconify-icon icon="solar:users-group-rounded-bold-duotone" class="fs-6"></iconify-icon>
-                <span class="hide-menu">Kelola Anggota</span>
-              </a>
-            </li>
             @endif
 
           </ul>
@@ -102,19 +136,30 @@
     {{-- ===================== MAIN WRAPPER ===================== --}}
     <div class="body-wrapper">
 
-      {{-- ===================== HEADER / NAVBAR ===================== --}}
+      {{-- ===================== HEADER ===================== --}}
       <header class="app-header">
         <nav class="navbar navbar-expand-lg navbar-light">
           <ul class="navbar-nav">
             <li class="nav-item d-block d-xl-none">
-              <a class="nav-link sidebartoggler nav-icon-hover" id="headerCollapse" href="javascript:void(0)">
+              <a class="nav-link sidebartoggler nav-icon-hover" href="javascript:void(0)">
                 <iconify-icon icon="solar:hamburger-menu-line-duotone" class="fs-6"></iconify-icon>
               </a>
             </li>
           </ul>
-
-          <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
+          <div class="navbar-collapse justify-content-end px-0">
             <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+
+              {{-- Badge Role --}}
+              <li class="nav-item me-2">
+                @php
+                  $roleBadge = match(auth()->user()->role) {
+                    'admin'   => 'danger',
+                    'petugas' => 'info',
+                    default   => 'primary',
+                  };
+                @endphp
+                <span class="badge bg-{{ $roleBadge }}">{{ ucfirst(auth()->user()->role) }}</span>
+              </li>
 
               {{-- Nama User --}}
               <li class="nav-item">
@@ -142,6 +187,21 @@
 
       {{-- ===================== CONTENT ===================== --}}
       <div class="container-fluid">
+        @if(session('success'))
+          <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            <iconify-icon icon="solar:check-circle-bold" class="me-1"></iconify-icon>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        @endif
+        @if(session('error'))
+          <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+            <iconify-icon icon="solar:danger-bold" class="me-1"></iconify-icon>
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        @endif
+
         @yield('content')
       </div>
 
