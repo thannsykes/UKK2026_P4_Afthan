@@ -27,13 +27,11 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    // Relasi ke tabel anggota
     public function anggota()
     {
         return $this->hasOne(Anggota::class, 'user_id');
     }
 
-    // Relasi ke tabel transaksi
     public function transaksi()
     {
         return $this->hasMany(Transaksi::class, 'user_id');

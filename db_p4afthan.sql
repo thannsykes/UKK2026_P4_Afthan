@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 09, 2026 at 01:05 AM
+-- Generation Time: Apr 10, 2026 at 12:16 PM
 -- Server version: 8.0.30
 -- PHP Version: 8.3.15
 
@@ -45,7 +45,10 @@ CREATE TABLE `buku` (
   `penulis` varchar(255) DEFAULT NULL,
   `penerbit` varchar(255) DEFAULT NULL,
   `tahun` int DEFAULT NULL,
-  `stok` int DEFAULT NULL
+  `stok` int DEFAULT NULL,
+  `rak_id` int DEFAULT NULL,
+  `pengarang` varchar(255) DEFAULT NULL,
+  `penerbit_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -75,6 +78,18 @@ CREATE TABLE `kelas` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `rak`
+--
+
+CREATE TABLE `rak` (
+  `id` int NOT NULL,
+  `nama_rak` varchar(255) DEFAULT NULL,
+  `lokasi` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `transaksi`
 --
 
@@ -83,7 +98,8 @@ CREATE TABLE `transaksi` (
   `user_id` int DEFAULT NULL,
   `tanggal_pinjam` date DEFAULT NULL,
   `tanggal_kembali` date DEFAULT NULL,
-  `status` enum('dipinjam','dikembalikan') DEFAULT NULL
+  `status` enum('menunggu','dipinjam','dikembalikan','ditolak') DEFAULT 'menunggu',
+  `denda` int DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -97,7 +113,7 @@ CREATE TABLE `users` (
   `nama` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
-  `role` enum('admin','user') DEFAULT 'user',
+  `role` enum('admin','petugas','anggota') DEFAULT 'anggota',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -107,8 +123,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `nama`, `email`, `password`, `role`, `created_at`, `updated_at`) VALUES
-(4, 'Anggota 1', 'anggota@ukk2026.com', '$2y$12$DiBSO1y/GjbK0G5bk/pmWOeOmphVLfHBTwW8GXyLgq6V.iZimwhqa', 'user', '2026-04-08 17:44:06', '2026-04-08 17:44:06'),
-(5, 'Admin 1', 'admin@ukk2026.com', '$2y$12$FsLfOzgpSQH/Odzcv0mv7O.CXsQk689nnWvPzzevytlDngz2G7icO', 'admin', '2026-04-08 17:51:19', '2026-04-08 17:51:19');
+(4, 'Anggota 1', 'anggota@ukk2026.com', '$2y$12$DiBSO1y/GjbK0G5bk/pmWOeOmphVLfHBTwW8GXyLgq6V.iZimwhqa', 'anggota', '2026-04-08 17:44:06', '2026-04-08 17:44:06'),
+(5, 'Admin 1', 'admin@ukk2026.com', '$2y$12$FsLfOzgpSQH/Odzcv0mv7O.CXsQk689nnWvPzzevytlDngz2G7icO', 'admin', '2026-04-08 17:51:19', '2026-04-08 17:51:19'),
+(6, 'Petugas 1', 'petugas@ukk2026.com', '$2y$12$TKh8H1.PfbuNz0jSCa4LR.LoY7rWJHgMFbTFmSiJWkJMYbIPYlD2e', 'petugas', '2026-04-10 04:25:43', '2026-04-10 04:25:43');
 
 --
 -- Indexes for dumped tables
@@ -126,7 +143,8 @@ ALTER TABLE `anggota`
 -- Indexes for table `buku`
 --
 ALTER TABLE `buku`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `rak_id` (`rak_id`);
 
 --
 -- Indexes for table `detail_transaksi`
@@ -140,6 +158,12 @@ ALTER TABLE `detail_transaksi`
 -- Indexes for table `kelas`
 --
 ALTER TABLE `kelas`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `rak`
+--
+ALTER TABLE `rak`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -185,6 +209,12 @@ ALTER TABLE `kelas`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `rak`
+--
+ALTER TABLE `rak`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `transaksi`
 --
 ALTER TABLE `transaksi`
@@ -194,7 +224,7 @@ ALTER TABLE `transaksi`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables
@@ -206,6 +236,12 @@ ALTER TABLE `users`
 ALTER TABLE `anggota`
   ADD CONSTRAINT `anggota_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `anggota_ibfk_2` FOREIGN KEY (`kelas_id`) REFERENCES `kelas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `buku`
+--
+ALTER TABLE `buku`
+  ADD CONSTRAINT `buku_ibfk_1` FOREIGN KEY (`rak_id`) REFERENCES `rak` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Constraints for table `detail_transaksi`

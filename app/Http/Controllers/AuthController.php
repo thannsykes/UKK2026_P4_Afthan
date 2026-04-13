@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // ==================== LOGIN ====================
-
     public function showLoginForm()
     {
         return view('auth.login');
@@ -34,18 +32,22 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
-            // Redirect berdasarkan role
-            if (Auth::user()->role === 'admin') {
-                return redirect()->intended('/admin/dashboard');
-            }
+            ([
+                'berhasil' => true,
+                'user'     => Auth::user(),
+                'role'     => Auth::user()->role,
+                'session'  => session()->all(),
+            ]);
 
-            return redirect()->intended('/dashboard');
+            return match (Auth::user()->role) {
+                'admin'   => redirect()->intended('/admin/dashboard'),
+                'petugas' => redirect()->intended('/petugas/dashboard'),
+                default   => redirect()->intended('/anggota/dashboard'),
+            };
         }
 
         return back()->with('loginError', 'Email atau password salah.');
     }
-
-    // ==================== REGISTER ====================
 
     public function showRegisterForm()
     {
@@ -72,15 +74,13 @@ class AuthController extends Controller
             'nama'     => $request->nama,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'role'     => 'user', // default role saat register
+            'role'     => 'anggota',
         ]);
 
         Auth::login($user);
 
-        return redirect('/dashboard');
+        return redirect('/anggota/dashboard');
     }
-
-    // ==================== LOGOUT ====================
 
     public function logout(Request $request)
     {
