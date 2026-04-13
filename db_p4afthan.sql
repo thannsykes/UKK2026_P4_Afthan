@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 10, 2026 at 12:16 PM
+-- Generation Time: Apr 13, 2026 at 08:23 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.3.15
 
@@ -30,8 +30,17 @@ SET time_zone = "+00:00";
 CREATE TABLE `anggota` (
   `id` int NOT NULL,
   `user_id` int DEFAULT NULL,
-  `kelas_id` int DEFAULT NULL
+  `kelas_id` int DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `anggota`
+--
+
+INSERT INTO `anggota` (`id`, `user_id`, `kelas_id`, `created_at`, `updated_at`) VALUES
+(1, 7, 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -48,8 +57,17 @@ CREATE TABLE `buku` (
   `stok` int DEFAULT NULL,
   `rak_id` int DEFAULT NULL,
   `pengarang` varchar(255) DEFAULT NULL,
-  `penerbit_id` int DEFAULT NULL
+  `penerbit_id` int DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `buku`
+--
+
+INSERT INTO `buku` (`id`, `judul`, `penulis`, `penerbit`, `tahun`, `stok`, `rak_id`, `pengarang`, `penerbit_id`, `created_at`, `updated_at`) VALUES
+(1, 'Where the Crawdads Sing', 'Delia Owens', 'G. P. Putnams Sons', 2018, 6, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -61,8 +79,19 @@ CREATE TABLE `detail_transaksi` (
   `id` int NOT NULL,
   `transaksi_id` int DEFAULT NULL,
   `buku_id` int DEFAULT NULL,
-  `jumlah` int DEFAULT NULL
+  `jumlah` int DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `detail_transaksi`
+--
+
+INSERT INTO `detail_transaksi` (`id`, `transaksi_id`, `buku_id`, `jumlah`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 1, NULL, NULL),
+(2, 2, 1, 1, NULL, NULL),
+(3, 3, 1, 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -72,8 +101,17 @@ CREATE TABLE `detail_transaksi` (
 
 CREATE TABLE `kelas` (
   `id` int NOT NULL,
-  `nama_kelas` varchar(255) DEFAULT NULL
+  `nama_kelas` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `kelas`
+--
+
+INSERT INTO `kelas` (`id`, `nama_kelas`, `created_at`, `updated_at`) VALUES
+(1, 'XII RPL', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -84,7 +122,9 @@ CREATE TABLE `kelas` (
 CREATE TABLE `rak` (
   `id` int NOT NULL,
   `nama_rak` varchar(255) DEFAULT NULL,
-  `lokasi` varchar(255) DEFAULT NULL
+  `lokasi` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -98,9 +138,20 @@ CREATE TABLE `transaksi` (
   `user_id` int DEFAULT NULL,
   `tanggal_pinjam` date DEFAULT NULL,
   `tanggal_kembali` date DEFAULT NULL,
-  `status` enum('menunggu','dipinjam','dikembalikan','ditolak') DEFAULT 'menunggu',
-  `denda` int DEFAULT '0'
+  `status` enum('menunggu','dipinjam','dikembalikan','ditolak','menunggu_kembali') DEFAULT 'menunggu',
+  `denda` int DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `transaksi`
+--
+
+INSERT INTO `transaksi` (`id`, `user_id`, `tanggal_pinjam`, `tanggal_kembali`, `status`, `denda`, `created_at`, `updated_at`) VALUES
+(1, 4, '2026-04-13', '2026-04-20', 'dikembalikan', 0, NULL, NULL),
+(2, 4, '2026-04-13', '2026-04-20', 'ditolak', 0, NULL, NULL),
+(3, 4, '2026-04-13', '2026-04-20', 'menunggu', 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -125,7 +176,8 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `nama`, `email`, `password`, `role`, `created_at`, `updated_at`) VALUES
 (4, 'Anggota 1', 'anggota@ukk2026.com', '$2y$12$DiBSO1y/GjbK0G5bk/pmWOeOmphVLfHBTwW8GXyLgq6V.iZimwhqa', 'anggota', '2026-04-08 17:44:06', '2026-04-08 17:44:06'),
 (5, 'Admin 1', 'admin@ukk2026.com', '$2y$12$FsLfOzgpSQH/Odzcv0mv7O.CXsQk689nnWvPzzevytlDngz2G7icO', 'admin', '2026-04-08 17:51:19', '2026-04-08 17:51:19'),
-(6, 'Petugas 1', 'petugas@ukk2026.com', '$2y$12$TKh8H1.PfbuNz0jSCa4LR.LoY7rWJHgMFbTFmSiJWkJMYbIPYlD2e', 'petugas', '2026-04-10 04:25:43', '2026-04-10 04:25:43');
+(7, 'Anggota CRUD', 'anggota2@ukk2026.com', '$2y$12$TB/ENs1jyeroCGGDMGCbf.9/XMf2h7Uv8L8WK8QDNNFohQvKoThze', 'anggota', '2026-04-12 20:39:56', '2026-04-12 20:39:56'),
+(8, 'Petugas', 'petugas@ukk2026.com', '$2y$12$VeOeOclMVIVAjS8mXIMLk.XzL47xxg3xBqeBkAqMu4nHlq7ILtlD6', 'petugas', '2026-04-13 00:48:07', '2026-04-13 00:48:07');
 
 --
 -- Indexes for dumped tables
@@ -188,25 +240,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `anggota`
 --
 ALTER TABLE `anggota`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `buku`
 --
 ALTER TABLE `buku`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `detail_transaksi`
 --
 ALTER TABLE `detail_transaksi`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `kelas`
 --
 ALTER TABLE `kelas`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `rak`
@@ -218,13 +270,13 @@ ALTER TABLE `rak`
 -- AUTO_INCREMENT for table `transaksi`
 --
 ALTER TABLE `transaksi`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Constraints for dumped tables
