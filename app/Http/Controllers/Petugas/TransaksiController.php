@@ -25,7 +25,7 @@ class TransaksiController extends Controller
         return view('petugas.transaksi.show', compact('transaksi'));
     }
 
-    // Terima peminjaman
+    // ✅ TERIMA PEMINJAMAN (FIX DI SINI)
     public function terima(string $id)
     {
         $transaksi = Transaksi::where('status', 'menunggu')->findOrFail($id);
@@ -33,16 +33,17 @@ class TransaksiController extends Controller
         // Kurangi stok buku
         foreach ($transaksi->detailTransaksi as $detail) {
             $buku = Buku::findOrFail($detail->buku_id);
+
             if ($buku->stok <= 0) {
                 return back()->with('error', 'Stok buku "' . $buku->judul . '" habis.');
             }
+
             $buku->decrement('stok');
         }
 
+        // ✅ FIX: jangan ubah tanggal lagi
         $transaksi->update([
-            'status'          => 'dipinjam',
-            'tanggal_pinjam'  => Carbon::now()->toDateString(),
-            'tanggal_kembali' => Carbon::now()->addDays(7)->toDateString(),
+            'status' => 'dipinjam',
         ]);
 
         return back()->with('success', 'Peminjaman berhasil diterima.');
@@ -59,36 +60,36 @@ class TransaksiController extends Controller
 
     // Proses pengembalian
     public function kembalikan(string $id)
-{
-    // Ubah dari 'dipinjam' menjadi bisa handle keduanya
-    $transaksi = Transaksi::whereIn('status', ['dipinjam', 'menunggu_kembali'])
-                    ->findOrFail($id);
+    {
+        $transaksi = Transaksi::whereIn('status', ['dipinjam', 'menunggu_kembali'])
+                        ->findOrFail($id);
 
-    // Hitung denda jika terlambat
-    $denda = 0;
-    $tanggalKembali = Carbon::parse($transaksi->tanggal_kembali);
-    if (Carbon::now()->gt($tanggalKembali)) {
-        $hariTerlambat = Carbon::now()->diffInDays($tanggalKembali);
-        $denda = $hariTerlambat * 1000;
+        // Hitung denda
+        $denda = 0;
+        $tanggalKembali = Carbon::parse($transaksi->tanggal_kembali);
+
+        if (Carbon::now()->gt($tanggalKembali)) {
+            $hariTerlambat = Carbon::now()->diffInDays($tanggalKembali);
+            $denda = $hariTerlambat * 1000;
+        }
+
+        // Kembalikan stok buku
+        foreach ($transaksi->detailTransaksi as $detail) {
+            $detail->buku->increment('stok');
+        }
+
+        $transaksi->update([
+            'status' => 'dikembalikan',
+            'denda'  => $denda,
+        ]);
+
+        $msg = 'Buku berhasil dikembalikan.';
+        if ($denda > 0) {
+            $msg .= ' Denda: Rp ' . number_format($denda, 0, ',', '.');
+        }
+
+        return back()->with('success', $msg);
     }
-
-    // Kembalikan stok buku
-    foreach ($transaksi->detailTransaksi as $detail) {
-        $detail->buku->increment('stok');
-    }
-
-    $transaksi->update([
-        'status' => 'dikembalikan',
-        'denda'  => $denda,
-    ]);
-
-    $msg = 'Buku berhasil dikembalikan.';
-    if ($denda > 0) {
-        $msg .= ' Denda: Rp ' . number_format($denda, 0, ',', '.');
-    }
-
-    return back()->with('success', $msg);
-}
 
     // Lunasi denda
     public function lunasi(string $id)

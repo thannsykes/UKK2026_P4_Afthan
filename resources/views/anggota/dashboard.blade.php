@@ -5,8 +5,8 @@
 @section('content')
 <div class="row py-4">
     <div class="col-12 mb-4">
-        <h4 class="fw-semibold">Selamat datang, {{ auth()->user()->nama }}!</h4>
-        <p class="text-muted mb-0">Berikut ringkasan aktivitas peminjaman buku kamu.</p>
+        <h4 class="fw-semibold">Selamat datang, {{ auth()->user()->nama }}! 👋</h4>
+        <p class="text-muted mb-0">Berikut ringkasan aktivitas peminjaman buku kamu 📚</p>
     </div>
 
     {{-- STAT CARDS --}}
@@ -71,13 +71,16 @@
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header bg-white border-0 pt-4 pb-2 d-flex justify-content-between align-items-center">
                 <h5 class="fw-semibold mb-0">Peminjaman Aktif</h5>
-                <a href="{{ route('anggota.history') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
+                <a href="{{ route('anggota.history') }}" class="btn btn-sm btn-outline-primary">
+                    Lihat Semua
+                </a>
             </div>
+
             <div class="card-body p-0">
                 @if($activeLoans->isEmpty())
                     <div class="text-center py-5 text-muted">
                         <iconify-icon icon="solar:book-minimalistic-bold-duotone" class="fs-1 mb-2"></iconify-icon>
-                        <p class="mb-0">Tidak ada peminjaman aktif</p>
+                        <p class="mb-0">Tidak ada peminjaman aktif 📭</p>
                     </div>
                 @else
                     <div class="table-responsive">
@@ -95,7 +98,9 @@
                                     @foreach($loan->detailTransaksi as $detail)
                                     <tr>
                                         <td class="ps-4">
-                                            <span class="fw-medium">{{ $detail->buku->judul ?? '-' }}</span>
+                                            <span class="fw-medium">
+                                                {{ $detail->buku->judul ?? '-' }}
+                                            </span>
                                         </td>
                                         <td class="text-muted small">
                                             {{ $loan->tanggal_pinjam ? \Carbon\Carbon::parse($loan->tanggal_pinjam)->format('d M Y') : '-' }}
@@ -106,12 +111,15 @@
                                         <td>
                                             @php
                                                 $badge = match($loan->status) {
-                                                    'menunggu'  => 'warning',
-                                                    'dipinjam'  => 'primary',
-                                                    default     => 'secondary',
+                                                    'menunggu' => 'warning',
+                                                    'dipinjam' => 'primary',
+                                                    default => 'secondary',
                                                 };
                                             @endphp
-                                            <span class="badge bg-{{ $badge }}">{{ ucfirst($loan->status) }}</span>
+
+                                            <span class="badge bg-{{ $badge }}">
+                                                {{ ucfirst($loan->status) }}
+                                            </span>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -124,31 +132,50 @@
         </div>
     </div>
 
-    {{-- BUKU TERBARU --}}
+    {{-- BUKU TERSEDIA --}}
     <div class="col-lg-5 mb-4">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header bg-white border-0 pt-4 pb-2 d-flex justify-content-between align-items-center">
                 <h5 class="fw-semibold mb-0">Buku Tersedia</h5>
-                <a href="{{ route('anggota.buku.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
+                <a href="{{ route('anggota.buku.index') }}" class="btn btn-sm btn-outline-primary">
+                    Lihat Semua
+                </a>
             </div>
+
             <div class="card-body p-0">
                 @if($recentBooks->isEmpty())
                     <div class="text-center py-5 text-muted">
                         <iconify-icon icon="solar:book-bold-duotone" class="fs-1 mb-2"></iconify-icon>
-                        <p class="mb-0">Tidak ada buku tersedia</p>
+                        <p class="mb-0">Tidak ada buku tersedia 📚</p>
                     </div>
                 @else
                     <ul class="list-group list-group-flush">
                         @foreach($recentBooks as $buku)
                         <li class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center">
                             <div>
-                                <p class="mb-0 fw-medium">{{ $buku->judul }}</p>
-                                <small class="text-muted">{{ $buku->pengarang ?? '-' }}</small>
+                                <p class="mb-1 fw-medium">{{ $buku->judul }}</p>
+
+                                <small class="text-muted d-block">
+                                    {{ $buku->pengarang->nama_pengarang ?? '-' }}
+                                </small>
+
+                                <small class="text-muted d-block">
+                                    {{ $buku->penerbit->nama_penerbit ?? '-' }}
+                                    {{ $buku->tahun ? '(' . $buku->tahun . ')' : '' }}
+                                </small>
                             </div>
+
                             <div class="text-end">
-                                <span class="badge bg-success-subtle text-success">Stok: {{ $buku->stok }}</span>
-                                <div class="mt-1">
-                                    <a href="{{ route('anggota.buku.index') }}" class="btn btn-sm btn-primary py-0 px-2" style="font-size:0.75rem">Pinjam</a>
+                                <span class="badge bg-success-subtle text-success mb-2">
+                                    Stok: {{ $buku->stok }}
+                                </span>
+
+                                <div>
+                                    <a href="{{ route('anggota.pinjam.konfirmasi', $buku->id) }}"
+                                       class="btn btn-sm btn-primary py-0 px-2 {{ $buku->stok == 0 ? 'disabled' : '' }}"
+                                       style="font-size:0.75rem">
+                                        Pinjam
+                                    </a>
                                 </div>
                             </div>
                         </li>
