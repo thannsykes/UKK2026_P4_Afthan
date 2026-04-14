@@ -23,14 +23,30 @@ class PeminjamanController extends Controller
         return view('anggota.peminjaman.history', compact('transaksi'));
     }
 
-    // Ajukan peminjaman buku
+    // Form konfirmasi peminjaman (pilih jumlah hari)
+    public function konfirmasi(string $bukuId)
+    {
+        $buku = Buku::findOrFail($bukuId);
+
+        if ($buku->stok <= 0) {
+            return redirect()->route('anggota.buku.index')
+                             ->with('error', 'Stok buku habis.');
+        }
+
+        return view('anggota.peminjaman.konfirmasi', compact('buku'));
+    }
+
+    // Simpan peminjaman
     public function store(Request $request)
     {
         $request->validate([
-            'buku_id' => 'required|exists:buku,id',
+            'buku_id'     => 'required|exists:buku,id',
+            'jumlah_hari' => 'required|integer|min:1|max:30',
         ], [
-            'buku_id.required' => 'Pilih buku yang ingin dipinjam.',
-            'buku_id.exists'   => 'Buku tidak ditemukan.',
+            'buku_id.required'     => 'Buku tidak valid.',
+            'jumlah_hari.required' => 'Jumlah hari wajib diisi.',
+            'jumlah_hari.min'      => 'Minimal peminjaman 1 hari.',
+            'jumlah_hari.max'      => 'Maksimal peminjaman 30 hari.',
         ]);
 
         $userId = Auth::id();
@@ -38,7 +54,7 @@ class PeminjamanController extends Controller
         // Cek apakah anggota sudah punya peminjaman aktif >= 3 buku
         $totalAktif = DetailTransaksi::whereHas('transaksi', function($q) use ($userId) {
             $q->where('user_id', $userId)
-              ->whereIn('status', ['menunggu', 'dipinjam']);
+              ->whereIn('status', ['menunggu', 'dipinjam', 'menunggu_kembali']);
         })->count();
 
         if ($totalAktif >= 3) {
@@ -55,12 +71,11 @@ class PeminjamanController extends Controller
         $transaksi = Transaksi::create([
             'user_id'         => $userId,
             'tanggal_pinjam'  => Carbon::now()->toDateString(),
-            'tanggal_kembali' => Carbon::now()->addDays(7)->toDateString(),
+            'tanggal_kembali' => Carbon::now()->addDays((int)$request->jumlah_hari)->toDateString(),
             'status'          => 'menunggu',
             'denda'           => 0,
         ]);
 
-        // Buat detail transaksi
         DetailTransaksi::create([
             'transaksi_id' => $transaksi->id,
             'buku_id'      => $buku->id,
@@ -68,7 +83,7 @@ class PeminjamanController extends Controller
         ]);
 
         return redirect()->route('anggota.history')
-                         ->with('success', 'Permintaan peminjaman berhasil diajukan. Menunggu persetujuan petugas.');
+                         ->with('success', 'Permintaan peminjaman berhasil diajukan selama ' . $request->jumlah_hari . ' hari. Menunggu persetujuan petugas.');
     }
 
     // Anggota mengajukan pengembalian
@@ -80,6 +95,6 @@ class PeminjamanController extends Controller
 
         $transaksi->update(['status' => 'menunggu_kembali']);
 
-        return back()->with('success', 'Permintaan pengembalian berhasil diajukan.');
+        return back()->with('success', 'Permintaan pengembalian berhasil diajukan. Menunggu konfirmasi petugas.');
     }
 }

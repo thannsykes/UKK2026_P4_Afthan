@@ -13,6 +13,9 @@ class Anggota extends Model
     protected $fillable = [
         'user_id',
         'kelas_id',
+        'no_telp',
+        'nis',
+        'status',
     ];
 
     public function user()

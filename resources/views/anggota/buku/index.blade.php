@@ -13,23 +13,27 @@
     @forelse($buku as $b)
     <div class="col-md-4 col-lg-3">
       <div class="card h-100">
-        <div class="card-body">
-          <div class="p-2 rounded bg-info bg-opacity-10 text-info d-inline-block mb-2">
-            <iconify-icon icon="solar:book-2-bold" width="24"></iconify-icon>
+        {{-- Foto Buku --}}
+        @if($b->foto)
+          <img src="{{ asset($b->foto) }}" alt="{{ $b->judul }}"
+               class="card-img-top" style="height:180px; object-fit:cover;">
+        @else
+          <div class="d-flex align-items-center justify-content-center bg-light"
+               style="height:180px;">
+            <iconify-icon icon="solar:book-2-bold" width="48" class="text-muted opacity-50"></iconify-icon>
           </div>
+        @endif
+        <div class="card-body d-flex flex-column">
           <h6 class="fw-semibold">{{ $b->judul }}</h6>
           <p class="text-muted small mb-1">{{ $b->penulis }}</p>
           <p class="text-muted small mb-2">{{ $b->penerbit ?? '' }} {{ $b->tahun ? '(' . $b->tahun . ')' : '' }}</p>
           <span class="badge bg-success mb-3">Stok: {{ $b->stok }}</span>
-          <form method="POST" action="{{ route('anggota.pinjam.store') }}">
-            @csrf
-            <input type="hidden" name="buku_id" value="{{ $b->id }}">
-            <button type="submit" class="btn btn-primary btn-sm w-100"
-                    onclick="return confirm('Pinjam buku {{ $b->judul }}?')">
+          <div class="mt-auto">
+            <a href="{{ route('anggota.pinjam.konfirmasi', $b->id) }}" class="btn btn-primary btn-sm w-100">
               <iconify-icon icon="solar:hand-money-bold" class="me-1"></iconify-icon>
               Pinjam
-            </button>
-          </form>
+            </a>
+          </div>
         </div>
       </div>
     </div>

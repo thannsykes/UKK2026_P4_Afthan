@@ -72,6 +72,35 @@
                 <span class="hide-menu">CRUD Kelas</span>
               </a>
             </li>
+            <li class="sidebar-item">
+ <li class="sidebar-item">
+  <a class="sidebar-link {{ request()->routeIs('admin.rak.*') ? 'active' : '' }}"
+    href="{{ route('admin.rak.index') }}">
+    <iconify-icon icon="solar:archive-bold-duotone" class="fs-6"></iconify-icon>
+    <span class="hide-menu">CRUD Rak Buku</span>
+  </a>
+</li>
+<li class="sidebar-item">
+  <a class="sidebar-link {{ request()->routeIs('admin.penerbit.*') ? 'active' : '' }}"
+    href="{{ route('admin.penerbit.index') }}">
+    <iconify-icon icon="solar:buildings-2-bold-duotone" class="fs-6"></iconify-icon>
+    <span class="hide-menu">CRUD Penerbit</span>
+  </a>
+</li>
+<li class="sidebar-item">
+  <a class="sidebar-link {{ request()->routeIs('admin.pengarang.*') ? 'active' : '' }}"
+    href="{{ route('admin.pengarang.index') }}">
+    <iconify-icon icon="solar:pen-bold-duotone" class="fs-6"></iconify-icon>
+    <span class="hide-menu">CRUD Pengarang</span>
+  </a>
+</li>
+<li class="sidebar-item">
+  <a class="sidebar-link {{ request()->routeIs('admin.kategori.*') ? 'active' : '' }}"
+    href="{{ route('admin.kategori.index') }}">
+    <iconify-icon icon="solar:tag-bold-duotone" class="fs-6"></iconify-icon>
+    <span class="hide-menu">CRUD Kategori</span>
+  </a>
+</li>
 
             {{-- ===== MENU PETUGAS ===== --}}
             @elseif(auth()->user()->role === 'petugas')
@@ -95,6 +124,13 @@
                 <span class="hide-menu">Transaksi Peminjaman</span>
               </a>
             </li>
+            <li class="sidebar-item">
+  <a class="sidebar-link {{ request()->routeIs('petugas.denda.*') ? 'active' : '' }}"
+    href="{{ route('petugas.denda.index') }}">
+    <iconify-icon icon="solar:wallet-money-bold-duotone" class="fs-6"></iconify-icon>
+    <span class="hide-menu">Pelunasan Denda</span>
+  </a>
+</li>
 
             {{-- ===== MENU ANGGOTA ===== --}}
             @else

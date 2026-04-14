@@ -74,12 +74,14 @@
                       @csrf @method('PATCH')
                       <button class="btn btn-sm btn-danger">Tolak</button>
                     </form>
-                  @elseif($t->status === 'dipinjam')
-                    <form method="POST" action="{{ route('petugas.transaksi.kembalikan', $t->id) }}"
-                          onsubmit="return confirm('Konfirmasi pengembalian buku ini?')">
-                      @csrf @method('PATCH')
-                      <button class="btn btn-sm btn-info text-white">Kembalikan</button>
-                    </form>
+                  @elseif(in_array($t->status, ['dipinjam', 'menunggu_kembali']))
+    <form method="POST" action="{{ route('petugas.transaksi.kembalikan', $t->id) }}"
+          onsubmit="return confirm('Konfirmasi pengembalian buku ini?')">
+        @csrf @method('PATCH')
+        <button class="btn btn-sm btn-info text-white">
+            {{ $t->status === 'menunggu_kembali' ? 'Konfirmasi Kembali' : 'Kembalikan' }}
+        </button>
+    </form>
                   @elseif($t->status === 'dikembalikan' && $t->denda > 0)
                     <form method="POST" action="{{ route('petugas.transaksi.lunasi', $t->id) }}"
                           onsubmit="return confirm('Tandai denda sudah lunas?')">

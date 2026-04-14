@@ -4,38 +4,57 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Buku;
-use App\Models\Kelas;
+use App\Models\Rak;
+use App\Models\Penerbit;
+use App\Models\Pengarang;
 use Illuminate\Http\Request;
 
 class BukuController extends Controller
 {
     public function index()
     {
-        $buku = Buku::orderBy('judul')->get();
+        $buku = Buku::with(['rak', 'penerbit', 'pengarang'])->orderBy('judul')->get();
         return view('admin.buku.index', compact('buku'));
     }
 
     public function create()
     {
-        return view('admin.buku.create');
+        $rak       = Rak::orderBy('nama_rak')->get();
+        $penerbit  = Penerbit::orderBy('nama_penerbit')->get();
+        $pengarang = Pengarang::orderBy('nama_pengarang')->get();
+        return view('admin.buku.create', compact('rak', 'penerbit', 'pengarang'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'judul'    => 'required|string|max:255',
-            'penulis'  => 'required|string|max:255',
-            'penerbit' => 'nullable|string|max:255',
-            'tahun'    => 'nullable|integer|min:1900|max:' . date('Y'),
-            'stok'     => 'required|integer|min:0',
+            'judul'        => 'required|string|max:255',
+            'pengarang_id' => 'required|exists:pengarang,id',
+            'penerbit_id'  => 'required|exists:penerbit,id',
+            'tahun'        => 'nullable|integer|min:1900|max:' . date('Y'),
+            'stok'         => 'required|integer|min:0',
+            'rak_id'       => 'nullable|exists:rak,id',
+            'foto'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ], [
-            'judul.required'   => 'Judul wajib diisi.',
-            'penulis.required' => 'Penulis wajib diisi.',
-            'stok.required'    => 'Stok wajib diisi.',
-            'stok.min'         => 'Stok tidak boleh negatif.',
+            'judul.required'        => 'Judul wajib diisi.',
+            'pengarang_id.required' => 'Pengarang wajib dipilih.',
+            'penerbit_id.required'  => 'Penerbit wajib dipilih.',
+            'stok.required'         => 'Stok wajib diisi.',
+            'foto.image'            => 'File harus berupa gambar.',
+            'foto.mimes'            => 'Format foto harus jpg, jpeg, png, atau webp.',
+            'foto.max'              => 'Ukuran foto maksimal 2MB.',
         ]);
 
-        Buku::create($request->only('judul', 'penulis', 'penerbit', 'tahun', 'stok'));
+        $data = $request->only('judul', 'pengarang_id', 'penerbit_id', 'tahun', 'stok', 'rak_id');
+
+        if ($request->hasFile('foto')) {
+            $foto = $request->file('foto');
+            $namaFoto = time() . '_' . $foto->getClientOriginalName();
+            $foto->move(public_path('uploads/buku'), $namaFoto);
+            $data['foto'] = 'uploads/buku/' . $namaFoto;
+        }
+
+        Buku::create($data);
 
         return redirect()->route('admin.buku.index')
                          ->with('success', 'Buku berhasil ditambahkan.');
@@ -43,8 +62,11 @@ class BukuController extends Controller
 
     public function edit(string $id)
     {
-        $buku = Buku::findOrFail($id);
-        return view('admin.buku.edit', compact('buku'));
+        $buku      = Buku::findOrFail($id);
+        $rak       = Rak::orderBy('nama_rak')->get();
+        $penerbit  = Penerbit::orderBy('nama_penerbit')->get();
+        $pengarang = Pengarang::orderBy('nama_pengarang')->get();
+        return view('admin.buku.edit', compact('buku', 'rak', 'penerbit', 'pengarang'));
     }
 
     public function update(Request $request, string $id)
@@ -52,19 +74,36 @@ class BukuController extends Controller
         $buku = Buku::findOrFail($id);
 
         $request->validate([
-            'judul'    => 'required|string|max:255',
-            'penulis'  => 'required|string|max:255',
-            'penerbit' => 'nullable|string|max:255',
-            'tahun'    => 'nullable|integer|min:1900|max:' . date('Y'),
-            'stok'     => 'required|integer|min:0',
+            'judul'        => 'required|string|max:255',
+            'pengarang_id' => 'required|exists:pengarang,id',
+            'penerbit_id'  => 'required|exists:penerbit,id',
+            'tahun'        => 'nullable|integer|min:1900|max:' . date('Y'),
+            'stok'         => 'required|integer|min:0',
+            'rak_id'       => 'nullable|exists:rak,id',
+            'foto'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ], [
-            'judul.required'   => 'Judul wajib diisi.',
-            'penulis.required' => 'Penulis wajib diisi.',
-            'stok.required'    => 'Stok wajib diisi.',
-            'stok.min'         => 'Stok tidak boleh negatif.',
+            'judul.required'        => 'Judul wajib diisi.',
+            'pengarang_id.required' => 'Pengarang wajib dipilih.',
+            'penerbit_id.required'  => 'Penerbit wajib dipilih.',
+            'stok.required'         => 'Stok wajib diisi.',
+            'foto.image'            => 'File harus berupa gambar.',
+            'foto.mimes'            => 'Format foto harus jpg, jpeg, png, atau webp.',
+            'foto.max'              => 'Ukuran foto maksimal 2MB.',
         ]);
 
-        $buku->update($request->only('judul', 'penulis', 'penerbit', 'tahun', 'stok'));
+        $data = $request->only('judul', 'pengarang_id', 'penerbit_id', 'tahun', 'stok', 'rak_id');
+
+        if ($request->hasFile('foto')) {
+            if ($buku->foto && file_exists(public_path($buku->foto))) {
+                unlink(public_path($buku->foto));
+            }
+            $foto = $request->file('foto');
+            $namaFoto = time() . '_' . $foto->getClientOriginalName();
+            $foto->move(public_path('uploads/buku'), $namaFoto);
+            $data['foto'] = 'uploads/buku/' . $namaFoto;
+        }
+
+        $buku->update($data);
 
         return redirect()->route('admin.buku.index')
                          ->with('success', 'Data buku berhasil diupdate.');
@@ -73,6 +112,9 @@ class BukuController extends Controller
     public function destroy(string $id)
     {
         $buku = Buku::findOrFail($id);
+        if ($buku->foto && file_exists(public_path($buku->foto))) {
+            unlink(public_path($buku->foto));
+        }
         $buku->delete();
 
         return redirect()->route('admin.buku.index')

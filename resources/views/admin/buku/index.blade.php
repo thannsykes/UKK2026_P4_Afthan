@@ -21,23 +21,37 @@
         <table class="table table-hover mb-0">
           <thead class="table-light">
             <tr>
-              <th width="50">No</th>
+              <th>No</th>
+              <th>Foto</th>
               <th>Judul</th>
-              <th>Penulis</th>
+              <th>Pengarang</th>
               <th>Penerbit</th>
               <th>Tahun</th>
-              <th width="80">Stok</th>
-              <th width="150">Aksi</th>
+              <th>Rak</th>
+              <th>Stok</th>
+              <th>Aksi</th>
             </tr>
           </thead>
           <tbody>
             @forelse($buku as $i => $b)
             <tr>
               <td>{{ $i + 1 }}</td>
+              <td>
+                @if($b->foto)
+                  <img src="{{ asset($b->foto) }}" alt="{{ $b->judul }}"
+                       class="rounded" style="width:50px; height:60px; object-fit:cover;">
+                @else
+                  <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                       style="width:50px; height:60px;">
+                    <iconify-icon icon="solar:book-2-bold" class="text-muted"></iconify-icon>
+                  </div>
+                @endif
+              </td>
               <td>{{ $b->judul }}</td>
-              <td>{{ $b->penulis }}</td>
-              <td>{{ $b->penerbit ?? '-' }}</td>
+              <td>{{ $b->pengarang->nama_pengarang ?? '-' }}</td>
+              <td>{{ $b->penerbit->nama_penerbit ?? '-' }}</td>
               <td>{{ $b->tahun ?? '-' }}</td>
+              <td>{{ $b->rak->nama_rak ?? '-' }}</td>
               <td>
                 <span class="badge {{ $b->stok > 0 ? 'bg-success' : 'bg-danger' }}">
                   {{ $b->stok }}
@@ -59,7 +73,7 @@
             </tr>
             @empty
             <tr>
-              <td colspan="7" class="text-center text-muted py-4">Belum ada buku</td>
+              <td colspan="9" class="text-center text-muted py-4">Belum ada buku</td>
             </tr>
             @endforelse
           </tbody>

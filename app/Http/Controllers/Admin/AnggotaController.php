@@ -30,6 +30,9 @@ class AnggotaController extends Controller
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:6|confirmed',
             'kelas_id' => 'nullable|exists:kelas,id',
+            'no_telp'  => 'nullable|string|max:20',
+            'nis'      => 'nullable|string|max:20|unique:anggota,nis',
+            'status'   => 'required|in:aktif,tidak aktif',
         ], [
             'nama.required'      => 'Nama wajib diisi.',
             'email.required'     => 'Email wajib diisi.',
@@ -38,6 +41,7 @@ class AnggotaController extends Controller
             'password.required'  => 'Password wajib diisi.',
             'password.min'       => 'Password minimal 6 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'nis.unique'         => 'NIS sudah terdaftar.',
         ]);
 
         $user = User::create([
@@ -47,13 +51,13 @@ class AnggotaController extends Controller
             'role'     => 'anggota',
         ]);
 
-        // Simpan ke tabel anggota jika ada kelas
-        if ($request->kelas_id) {
-            Anggota::create([
-                'user_id'  => $user->id,
-                'kelas_id' => $request->kelas_id,
-            ]);
-        }
+        Anggota::create([
+            'user_id'  => $user->id,
+            'kelas_id' => $request->kelas_id,
+            'no_telp'  => $request->no_telp,
+            'nis'      => $request->nis,
+            'status'   => $request->status,
+        ]);
 
         return redirect()->route('admin.anggota.index')
                          ->with('success', 'Akun anggota berhasil dibuat.');
@@ -61,8 +65,8 @@ class AnggotaController extends Controller
 
     public function edit(string $id)
     {
-        $anggota = User::where('role', 'anggota')->findOrFail($id);
-        $kelas   = Kelas::orderBy('nama_kelas')->get();
+        $anggota      = User::where('role', 'anggota')->findOrFail($id);
+        $kelas        = Kelas::orderBy('nama_kelas')->get();
         $kelasAnggota = Anggota::where('user_id', $id)->first();
         return view('admin.anggota.edit', compact('anggota', 'kelas', 'kelasAnggota'));
     }
@@ -76,6 +80,9 @@ class AnggotaController extends Controller
             'email'    => 'required|email|unique:users,email,' . $anggota->id,
             'password' => 'nullable|min:6|confirmed',
             'kelas_id' => 'nullable|exists:kelas,id',
+            'no_telp'  => 'nullable|string|max:20',
+            'nis'      => 'nullable|string|max:20|unique:anggota,nis,' . optional(Anggota::where('user_id', $id)->first())->id,
+            'status'   => 'required|in:aktif,tidak aktif',
         ], [
             'nama.required'      => 'Nama wajib diisi.',
             'email.required'     => 'Email wajib diisi.',
@@ -83,6 +90,7 @@ class AnggotaController extends Controller
             'email.unique'       => 'Email sudah terdaftar.',
             'password.min'       => 'Password minimal 6 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'nis.unique'         => 'NIS sudah terdaftar.',
         ]);
 
         $data = [
@@ -96,13 +104,15 @@ class AnggotaController extends Controller
 
         $anggota->update($data);
 
-        // Update atau buat data kelas anggota
-        if ($request->kelas_id) {
-            Anggota::updateOrCreate(
-                ['user_id' => $anggota->id],
-                ['kelas_id' => $request->kelas_id]
-            );
-        }
+        Anggota::updateOrCreate(
+            ['user_id' => $anggota->id],
+            [
+                'kelas_id' => $request->kelas_id,
+                'no_telp'  => $request->no_telp,
+                'nis'      => $request->nis,
+                'status'   => $request->status,
+            ]
+        );
 
         return redirect()->route('admin.anggota.index')
                          ->with('success', 'Data anggota berhasil diupdate.');
