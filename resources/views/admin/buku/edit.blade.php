@@ -60,6 +60,18 @@
             @error('penerbit_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
           </div>
 
+          <div class="col-md-6">
+            <label class="form-label">Kategori <span class="text-muted small">(opsional)</span></label>
+            <select name="kategori_id" class="form-select">
+              <option value="">-- Pilih Kategori --</option>
+              @foreach($kategori as $k)
+              <option value="{{ $k->id }}" {{ old('kategori_id', $buku->kategori_id) == $k->id ? 'selected' : '' }}>
+                {{ $k->nama_kategori }}
+              </option>
+              @endforeach
+            </select>
+          </div>
+
           <div class="col-md-3">
             <label class="form-label">Tahun Terbit</label>
             <input type="number" name="tahun"

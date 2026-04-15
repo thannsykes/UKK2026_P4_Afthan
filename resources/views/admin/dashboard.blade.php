@@ -7,7 +7,7 @@
   {{-- Header --}}
   <div class="card bg-danger text-white mb-4">
     <div class="card-body py-4">
-      <h4 class="mb-1 fw-bold">Dashboard Admin 👑</h4>
+      <h4 class="mb-1 fw-bold">Dashboard Admin</h4>
       <p class="mb-0 opacity-75">Selamat datang, {{ auth()->user()->nama }}</p>
     </div>
   </div>

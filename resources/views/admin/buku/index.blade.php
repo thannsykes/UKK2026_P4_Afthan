@@ -26,6 +26,7 @@
               <th>Judul</th>
               <th>Pengarang</th>
               <th>Penerbit</th>
+              <th>Kategori</th>
               <th>Tahun</th>
               <th>Rak</th>
               <th>Stok</th>
@@ -50,6 +51,7 @@
               <td>{{ $b->judul }}</td>
               <td>{{ $b->pengarang->nama_pengarang ?? '-' }}</td>
               <td>{{ $b->penerbit->nama_penerbit ?? '-' }}</td>
+              <td>{{ $b->kategori->nama_kategori ?? '-' }}</td>
               <td>{{ $b->tahun ?? '-' }}</td>
               <td>{{ $b->rak->nama_rak ?? '-' }}</td>
               <td>
@@ -73,7 +75,7 @@
             </tr>
             @empty
             <tr>
-              <td colspan="9" class="text-center text-muted py-4">Belum ada buku</td>
+              <td colspan="10" class="text-center text-muted py-4">Belum ada buku</td>
             </tr>
             @endforelse
           </tbody>
